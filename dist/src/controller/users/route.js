@@ -9,8 +9,8 @@ const index_1 = __importDefault(require("./index"));
 const CheckId_1 = require("../../middleware/CheckId");
 const checkUserId_1 = require("../../middleware/checkUserId");
 exports.default = router
-    .get("/all", checkUserId_1.CheckUserId, index_1.default.get)
+    .get("/all", index_1.default.get)
     .get("/id/:id", checkUserId_1.CheckUserId, CheckId_1.CheckId, index_1.default.getById)
-    .post("/login", checkUserId_1.CheckUserId, index_1.default.login)
-    .post("/register", checkUserId_1.CheckUserId, index_1.default.register)
+    .post("/login", index_1.default.login)
+    .post("/register", index_1.default.register)
     .put("/update/:id", checkUserId_1.CheckUserId, CheckId_1.CheckId, index_1.default.put);

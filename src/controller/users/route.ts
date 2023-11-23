@@ -4,8 +4,8 @@ import UserController from "./index";
 import { CheckId } from "../../middleware/CheckId";
 import { CheckUserId } from "../../middleware/checkUserId";
 export default router
-  .get("/all", CheckUserId, UserController.get)
+  .get("/all",  UserController.get)
   .get("/id/:id", CheckUserId, CheckId, UserController.getById)
-  .post("/login", CheckUserId, UserController.login)
-  .post("/register", CheckUserId, UserController.register)
+  .post("/login",  UserController.login)
+  .post("/register",  UserController.register)
   .put("/update/:id", CheckUserId, CheckId, UserController.put);
