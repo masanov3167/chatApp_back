@@ -13,21 +13,24 @@ import { CustomRequest } from "../../middleware/checkUserId";
 import notFoundResponse from "../../utils/notFoundResponse";
 
 const get = async (req: CustomRequest, res: Response, next: NextFunction) => {
-  const disableChannels = req.query?.disable_channels;
-  const relation = [];
-  if (!disableChannels) {
-    relation.push("channels");
-  }
-  const where: any = {};
-  const filterByRole = req.query?.role;
-  if (filterByRole && !isNaN(Number(filterByRole))) {
-    where.role = filterByRole;
-  }
-  const users = await findAll(Users, where, relation, { id: "DESC" });
+  const users = await findAll(Users, {}, undefined, { id: "DESC" });
   succesResponse(res, users, next);
 };
 
 const getById = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const data = await findOne(Users, { id: Number(req.params.id) });
+  if (data) {
+    succesResponse(res, data, next);
+  } else {
+    notFoundResponse(next);
+  }
+};
+
+const getMe = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
@@ -61,8 +64,9 @@ const login = async (
   if (!isValid) {    
     return next(new ErrorHandler("Login yoki parol xato", 400))
   }
+  
   const token = jwt.sign(
-    user,
+    {...user},
     envconfig.jwt_secret_key
   );
   succesResponse(res, {...user, token}, next);
@@ -82,9 +86,9 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
   }
 
   const salt = bcrypt.genSaltSync(10);
-  value.parol = bcrypt.hashSync(value.password, salt);
+  value.parol = bcrypt.hashSync(value.parol, salt);
   const newUser = await insert(Users, value)
-  if (newUser) {
+  if (newUser.ok) {
    return succesResponse(res, newUser.data, next);
   } else {
     return next(new ErrorHandler(newUser.msg, 500));

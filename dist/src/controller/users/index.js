@@ -24,21 +24,19 @@ const validationError_1 = __importDefault(require("../../utils/validationError")
 const envconfig_1 = __importDefault(require("../../config/envconfig"));
 const notFoundResponse_1 = __importDefault(require("../../utils/notFoundResponse"));
 const get = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    const disableChannels = (_a = req.query) === null || _a === void 0 ? void 0 : _a.disable_channels;
-    const relation = [];
-    if (!disableChannels) {
-        relation.push("channels");
-    }
-    const where = {};
-    const filterByRole = (_b = req.query) === null || _b === void 0 ? void 0 : _b.role;
-    if (filterByRole && !isNaN(Number(filterByRole))) {
-        where.role = filterByRole;
-    }
-    const users = yield (0, OrmFn_1.findAll)(users_entity_1.default, where, relation, { id: "DESC" });
+    const users = yield (0, OrmFn_1.findAll)(users_entity_1.default, {}, undefined, { id: "DESC" });
     (0, SuccessResponse_1.default)(res, users, next);
 });
 const getById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield (0, OrmFn_1.findOne)(users_entity_1.default, { id: Number(req.params.id) });
+    if (data) {
+        (0, SuccessResponse_1.default)(res, data, next);
+    }
+    else {
+        (0, notFoundResponse_1.default)(next);
+    }
+});
+const getMe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const data = yield (0, OrmFn_1.findOne)(users_entity_1.default, { id: Number(req.params.id) });
     if (data) {
         (0, SuccessResponse_1.default)(res, data, next);
@@ -61,7 +59,7 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     if (!isValid) {
         return next(new errorHandler_1.ErrorHandler("Login yoki parol xato", 400));
     }
-    const token = jsonwebtoken_1.default.sign(user, envconfig_1.default.jwt_secret_key);
+    const token = jsonwebtoken_1.default.sign(Object.assign({}, user), envconfig_1.default.jwt_secret_key);
     (0, SuccessResponse_1.default)(res, Object.assign(Object.assign({}, user), { token }), next);
 });
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -75,9 +73,9 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         return next(new errorHandler_1.ErrorHandler(`${value.login} loginli foydalanuvchi avvaldan mavjud`));
     }
     const salt = bcryptjs_1.default.genSaltSync(10);
-    value.parol = bcryptjs_1.default.hashSync(value.password, salt);
+    value.parol = bcryptjs_1.default.hashSync(value.parol, salt);
     const newUser = yield (0, OrmFn_1.insert)(users_entity_1.default, value);
-    if (newUser) {
+    if (newUser.ok) {
         return (0, SuccessResponse_1.default)(res, newUser.data, next);
     }
     else {
