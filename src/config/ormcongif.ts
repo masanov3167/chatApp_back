@@ -11,4 +11,5 @@ export const dataSource = new DataSource({
   database: envconfig.db_name,
   synchronize: true,
   entities: [path.resolve(__dirname, "..", "entities", "*.entity.{ts,js}")],
-});
+  // logging: true
+})

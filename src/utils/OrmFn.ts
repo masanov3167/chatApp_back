@@ -25,6 +25,8 @@ const findAll = async <T>(
     });
     return value;
   } catch (e) {
+    console.log(e);
+    
     return [];
   } finally {
     await dataSource

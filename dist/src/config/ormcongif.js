@@ -16,4 +16,5 @@ exports.dataSource = new typeorm_1.DataSource({
     database: envconfig_1.default.db_name,
     synchronize: true,
     entities: [path_1.default.resolve(__dirname, "..", "entities", "*.entity.{ts,js}")],
+    // logging: true
 });

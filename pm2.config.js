@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "tg bot backend",
+      name: "chat app backend",
       script: "./dist/src/server.js",
     },
   ],

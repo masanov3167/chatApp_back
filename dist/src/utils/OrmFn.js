@@ -31,6 +31,7 @@ const findAll = (model, where, relations, order) => __awaiter(void 0, void 0, vo
         return value;
     }
     catch (e) {
+        console.log(e);
         return [];
     }
     finally {

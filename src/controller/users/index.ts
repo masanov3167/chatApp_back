@@ -13,7 +13,7 @@ import { CustomRequest } from "../../middleware/checkUserId";
 import notFoundResponse from "../../utils/notFoundResponse";
 
 const get = async (req: CustomRequest, res: Response, next: NextFunction) => {
-  const users = await findAll(Users, {}, undefined, { id: "DESC" });
+  const users = await findAll(Users, {}, undefined, { id: "DESC" });  
   succesResponse(res, users, next);
 };
 
@@ -87,6 +87,8 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 
   const salt = bcrypt.genSaltSync(10);
   value.parol = bcrypt.hashSync(value.parol, salt);
+  console.log(value);
+  
   const newUser = await insert(Users, value)
   if (newUser.ok) {
    return succesResponse(res, newUser.data, next);

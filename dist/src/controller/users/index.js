@@ -74,6 +74,7 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
     const salt = bcryptjs_1.default.genSaltSync(10);
     value.parol = bcryptjs_1.default.hashSync(value.parol, salt);
+    console.log(value);
     const newUser = yield (0, OrmFn_1.insert)(users_entity_1.default, value);
     if (newUser.ok) {
         return (0, SuccessResponse_1.default)(res, newUser.data, next);
