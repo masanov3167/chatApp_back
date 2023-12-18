@@ -13,4 +13,4 @@ exports.default = router
     .get("/id/:id", checkUserId_1.CheckUserId, CheckId_1.CheckId, index_1.default.getById)
     .post("/login", index_1.default.login)
     .post("/register", index_1.default.register)
-    .put("/update/:id", checkUserId_1.CheckUserId, CheckId_1.CheckId, index_1.default.put);
+    .put("/update/:id", CheckId_1.CheckId, index_1.default.put);

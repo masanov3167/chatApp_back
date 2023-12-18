@@ -74,7 +74,6 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
     const salt = bcryptjs_1.default.genSaltSync(10);
     value.parol = bcryptjs_1.default.hashSync(value.parol, salt);
-    console.log(value);
     const newUser = yield (0, OrmFn_1.insert)(users_entity_1.default, value);
     if (newUser.ok) {
         return (0, SuccessResponse_1.default)(res, newUser.data, next);
@@ -89,11 +88,14 @@ const put = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         (0, validationError_1.default)(res, error, next);
         return;
     }
+    const salt = bcryptjs_1.default.genSaltSync(10);
+    value.parol = bcryptjs_1.default.hashSync(value.parol, salt);
     const updated = yield (0, OrmFn_1.update)(users_entity_1.default, { id: Number(req.params.id) }, value);
     if (!updated.ok) {
         return next(new errorHandler_1.ErrorHandler(updated.msg, 404));
     }
-    (0, SuccessResponse_1.default)(res, updated.data, next);
+    const token = jsonwebtoken_1.default.sign(Object.assign({}, updated.data), envconfig_1.default.jwt_secret_key);
+    (0, SuccessResponse_1.default)(res, Object.assign(Object.assign({}, updated.data), { token }), next);
 });
 exports.default = {
     get: (_, res, next) => __awaiter(void 0, void 0, void 0, function* () {

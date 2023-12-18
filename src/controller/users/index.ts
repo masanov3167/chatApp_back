@@ -87,7 +87,6 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 
   const salt = bcrypt.genSaltSync(10);
   value.parol = bcrypt.hashSync(value.parol, salt);
-  console.log(value);
   
   const newUser = await insert(Users, value)
   if (newUser.ok) {
@@ -97,21 +96,27 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const put = async (req: CustomRequest, res: Response, next: NextFunction) => {
+const put = async (req: CustomRequest, res: Response, next: NextFunction) => {  
   const { error, value } = Validate.put(req.body);
 
   if (error) {
     validationError(res, error, next);
     return;
   }
+  const salt = bcrypt.genSaltSync(10);
+  value.parol = bcrypt.hashSync(value.parol, salt);
 
   const updated = await update(Users, { id: Number(req.params.id) }, value);
 
   if (!updated.ok) {
     return next(new ErrorHandler(updated.msg, 404));
   }
+  const token = jwt.sign(
+    {...updated.data},
+    envconfig.jwt_secret_key
+  );
 
-  succesResponse(res, updated.data, next );
+  succesResponse(res, {...updated.data, token}, next );
 };
 
 export default {

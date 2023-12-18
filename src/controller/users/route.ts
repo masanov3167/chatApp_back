@@ -8,4 +8,4 @@ export default router
   .get("/id/:id", CheckUserId, CheckId, UserController.getById)
   .post("/login",  UserController.login)
   .post("/register",  UserController.register)
-  .put("/update/:id", CheckUserId, CheckId, UserController.put);
+  .put("/update/:id",  CheckId, UserController.put);
