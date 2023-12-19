@@ -5,34 +5,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const ErrorHandle_1 = require("./middleware/ErrorHandle");
-const socket_1 = __importDefault(require("./socket"));
 const http_1 = __importDefault(require("http"));
-const ws_1 = __importDefault(require("ws"));
-//express app
+const socket_io_1 = require("socket.io");
+const ErrorHandle_1 = require("./middleware/ErrorHandle");
 const app = (0, express_1.default)();
-//set port number
 const PORT = process.env.PORT || 5000;
-//import routes
 const route_1 = __importDefault(require("./controller/users/route"));
 const checkUserId_1 = require("./middleware/checkUserId");
-//connect
-const server = http_1.default.createServer(app);
-const wss = new ws_1.default.Server({ server });
-(0, socket_1.default)(wss);
-//cors control
+// Middleware
 app.use((0, cors_1.default)());
-//req body parser to json
 app.use(express_1.default.json());
-//use single routes
 app.use("/users", route_1.default);
 app.use(checkUserId_1.CheckUserId);
-//error handle middleware
 app.use(ErrorHandle_1.ErrorHandle);
-//404 not found path
-app.use("/*", (_, res) => res
-    .status(404)
-    .json({ ok: false, status: 404, message: `path not found ${_.url}` }));
+// Creating HTTP server
+const server = http_1.default.createServer(app);
+// Integrating Socket.IO with the HTTP server
+const io = new socket_io_1.Server(server);
+// Socket.IO connection handling
+io.on("connection", (socket) => {
+    console.log(`User connected: ${socket.id}`);
+    // Handle socket events or emit messages here
+    // Example:
+    socket.on("chat message", (msg) => {
+        console.log(`Message: ${msg}`);
+        io.emit("chat message", msg); // Broadcasting message to all connected clients
+    });
+    socket.on("disconnect", () => {
+        console.log(`User disconnected: ${socket.id}`);
+    });
+});
+// Start the server
 server.listen(PORT, () => {
-    console.log(PORT);
+    console.log(`Server running on port ${PORT}`);
 });

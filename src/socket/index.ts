@@ -1,8 +1,8 @@
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import messageSocket from "./messageSocket";
-import ws from "ws";
-import http from "http"
+import { Server } from "socket.io";
 
-export default (io : ws.Server<typeof ws, typeof http.IncomingMessage>) => {
+export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
   io.on('connection', (socket) => {
     messageSocket(io, socket)
   })

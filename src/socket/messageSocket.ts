@@ -1,16 +1,11 @@
-import ws from "ws";
-import http from "http"
+import { Server, Socket } from "socket.io";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
-export default (io : ws.Server<typeof ws, typeof http.IncomingMessage>, socket : ws) => {
+export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>, socket : Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
   try {
     socket.on("message", function incoming(message) {
         console.log(message);
-        io.clients.forEach(function each(client) {
-          if (client.readyState === ws.OPEN) {
-            client.send(`siz yozgan gap: ${message}` );
-          }
-        });
-        // io.emit("salom", ) 
+        io.send(`salom text: ${message}`)
       });
   } catch (error) {
     console.log(error);
