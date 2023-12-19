@@ -3,9 +3,9 @@ import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
 export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>, socket : Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
   try {
-    socket.on("message", function incoming(message) {
-        console.log(message);
-        io.emit("answer-message", `${message} ga serverdan javob`)
+      socket.on("message", (msg) => {
+        console.log(`Message: ${msg}`);
+        io.emit("answer-message", `${msg} ga serverdan javob`);
       });
   } catch (error) {
     console.log(error);
