@@ -4,7 +4,7 @@ exports.default = (io, socket) => {
     try {
         socket.on("message", function incoming(message) {
             console.log(message);
-            io.send(`salom text: ${message}`);
+            io.emit("answer-message", `${message} ga serverdan javob`);
         });
     }
     catch (error) {

@@ -12,6 +12,7 @@ const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
 const route_1 = __importDefault(require("./controller/users/route"));
 const checkUserId_1 = require("./middleware/checkUserId");
+const socket_1 = __importDefault(require("./socket"));
 // Middleware
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -23,18 +24,7 @@ const server = http_1.default.createServer(app);
 // Integrating Socket.IO with the HTTP server
 const io = new socket_io_1.Server(server);
 // Socket.IO connection handling
-io.on("connection", (socket) => {
-    console.log(`User connected: ${socket.id}`);
-    // Handle socket events or emit messages here
-    // Example:
-    socket.on("chat message", (msg) => {
-        console.log(`Message: ${msg}`);
-        io.emit("chat message", msg); // Broadcasting message to all connected clients
-    });
-    socket.on("disconnect", () => {
-        console.log(`User disconnected: ${socket.id}`);
-    });
-});
+(0, socket_1.default)(io);
 // Start the server
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

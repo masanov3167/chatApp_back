@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 5000;
 
 import UserRoutes from "./controller/users/route";
 import { CheckUserId } from "./middleware/checkUserId";
+import socket from "./socket";
 
 // Middleware
 app.use(cors());
@@ -25,20 +26,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 // Socket.IO connection handling
-io.on("connection", (socket) => {
-  console.log(`User connected: ${socket.id}`);
-
-  // Handle socket events or emit messages here
-  // Example:
-  socket.on("chat message", (msg) => {
-    console.log(`Message: ${msg}`);
-    io.emit("chat message", msg); // Broadcasting message to all connected clients
-  });
-
-  socket.on("disconnect", () => {
-    console.log(`User disconnected: ${socket.id}`);
-  });
-});
+socket(io)
 
 // Start the server
 server.listen(PORT, () => {
