@@ -18,12 +18,12 @@ function decoderToken(token) {
 exports.decoderToken = decoderToken;
 function signToken(user) {
     try {
-        const token = jsonwebtoken_1.default.sign(user, envconfig_1.default.jwt_secret_key, {
+        const token = jsonwebtoken_1.default.sign(Object.assign({}, user), envconfig_1.default.jwt_secret_key, {
             expiresIn: 60 * 60
         });
         return token;
     }
-    catch (_a) {
+    catch (e) {
         return false;
     }
 }
