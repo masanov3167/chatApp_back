@@ -11,17 +11,17 @@ export function decoderToken(token: string): Users | false {
   }
 }
 
-export function signToken( user: Users): string | false{
+export function signToken(user: Users): string | false{
     try{
         const token = jwt.sign(
-            user,
+            { ...user},
             envconfig.jwt_secret_key,
             {
-                expiresIn:60*60
+                expiresIn: 60*60
             }
-          )
+          );
         return token
-    }catch{
+    }catch(e){        
         return false
     }
 }
