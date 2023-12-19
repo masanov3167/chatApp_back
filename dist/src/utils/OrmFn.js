@@ -18,7 +18,7 @@ const ormcongif_1 = require("../config/ormcongif");
  * @param relations - relation qilib qo'shimcha datalar olish optional
  * @returns qiymatlar bo'yicha topilgan datalarni yuboradi agar muammo chiqib catchga tushsa bo'sh array qabul qilasiz
  */
-const findAll = (model, where, relations, order) => __awaiter(void 0, void 0, void 0, function* () {
+const findAll = (model, where, relations, order, select) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield ormcongif_1.dataSource
             .connect()
@@ -27,6 +27,7 @@ const findAll = (model, where, relations, order) => __awaiter(void 0, void 0, vo
             where,
             relations,
             order,
+            select
         });
         return value;
     }

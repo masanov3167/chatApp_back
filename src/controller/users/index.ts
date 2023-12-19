@@ -11,36 +11,14 @@ import validationError from "../../utils/validationError";
 import envconfig from "../../config/envconfig";
 import { CustomRequest } from "../../middleware/checkUserId";
 import notFoundResponse from "../../utils/notFoundResponse";
+import { Not } from "typeorm";
+import { signToken } from "../../utils/functions";
+import { RequestWithToken } from "../../middleware/checkUserToken";
 
 const get = async (req: CustomRequest, res: Response, next: NextFunction) => {
-  const users = await findAll(Users, {}, undefined, { id: "DESC" });  
+  const {user: currentUser} = req;
+  const users = await findAll(Users, {id: Not(currentUser.id)}, undefined, { id: "DESC" }, ["id", "name", "phone"]);  
   succesResponse(res, users, next);
-};
-
-const getById = async (
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  const data = await findOne(Users, { id: Number(req.params.id) });
-  if (data) {
-    succesResponse(res, data, next);
-  } else {
-    notFoundResponse(next);
-  }
-};
-
-const getMe = async (
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  const data = await findOne(Users, { id: Number(req.params.id) });
-  if (data) {
-    succesResponse(res, data, next);
-  } else {
-    notFoundResponse(next);
-  }
 };
 
 
@@ -65,14 +43,22 @@ const login = async (
     return next(new ErrorHandler("Login yoki parol xato", 400))
   }
   
-  const token = jwt.sign(
-    {...user},
-    envconfig.jwt_secret_key
-  );
+  const token = signToken(user);
+  if(!token){
+    return next(new ErrorHandler("Birozdan so'ng urinib ko'ring", 400))
+  }
   succesResponse(res, {...user, token}, next);
 };
 
-const register = async (req: Request, res: Response, next: NextFunction) => {
+interface registerRequest extends Request{
+  secretkey: string
+}
+
+const register = async (req: registerRequest, res: Response, next: NextFunction) => {
+  const {secretkey} = req.headers;
+  if(!secretkey || secretkey && secretkey != envconfig.jwt_secret_key){
+    return next(new ErrorHandler("Login yoki parol xato :("))
+  }
   const { error, value } = Validate.register(req.body)
 
   if (error) {
@@ -96,7 +82,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const put = async (req: CustomRequest, res: Response, next: NextFunction) => {  
+const put = async (req: RequestWithToken, res: Response, next: NextFunction) => {  
   const { error, value } = Validate.put(req.body);
 
   if (error) {
@@ -105,16 +91,18 @@ const put = async (req: CustomRequest, res: Response, next: NextFunction) => {
   }
   const salt = bcrypt.genSaltSync(10);
   value.parol = bcrypt.hashSync(value.parol, salt);
+  const {user} = req
 
-  const updated = await update(Users, { id: Number(req.params.id) }, value);
+  const updated = await update(Users, { id: user.id }, value);
 
   if (!updated.ok) {
     return next(new ErrorHandler(updated.msg, 404));
   }
-  const token = jwt.sign(
-    {...updated.data},
-    envconfig.jwt_secret_key
-  );
+  const token = signToken(updated.data);
+
+  if(!token){
+    return next(new ErrorHandler("Birozdan so'ng urinib ko'ring", 400))
+  }
 
   succesResponse(res, {...updated.data, token}, next );
 };
@@ -123,10 +111,6 @@ export default {
   get: async (_: Request, res: Response, next: NextFunction) => {
     getCustomParams(_, res, next, get);
   },
-  getById: async (req: Request, res: Response, next: NextFunction) => {
-    getCustomParams(req, res, next, getById);
-  },
-  
   login: async (req: Request, res: Response, next: NextFunction) => {
     getCustomParams(req, res, next, login);
   },

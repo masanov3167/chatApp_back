@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const users_entity_1 = __importDefault(require("../../entities/users.entity"));
 const errorHandler_1 = require("../../utils/errorHandler");
 const getCustomParams_1 = __importDefault(require("../../utils/getCustomParams"));
@@ -22,28 +21,12 @@ const SuccessResponse_1 = __importDefault(require("../../utils/SuccessResponse")
 const OrmFn_1 = require("../../utils/OrmFn");
 const validationError_1 = __importDefault(require("../../utils/validationError"));
 const envconfig_1 = __importDefault(require("../../config/envconfig"));
-const notFoundResponse_1 = __importDefault(require("../../utils/notFoundResponse"));
+const typeorm_1 = require("typeorm");
+const functions_1 = require("../../utils/functions");
 const get = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield (0, OrmFn_1.findAll)(users_entity_1.default, {}, undefined, { id: "DESC" });
+    const { user: currentUser } = req;
+    const users = yield (0, OrmFn_1.findAll)(users_entity_1.default, { id: (0, typeorm_1.Not)(currentUser.id) }, undefined, { id: "DESC" }, ["id", "name", "phone"]);
     (0, SuccessResponse_1.default)(res, users, next);
-});
-const getById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const data = yield (0, OrmFn_1.findOne)(users_entity_1.default, { id: Number(req.params.id) });
-    if (data) {
-        (0, SuccessResponse_1.default)(res, data, next);
-    }
-    else {
-        (0, notFoundResponse_1.default)(next);
-    }
-});
-const getMe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const data = yield (0, OrmFn_1.findOne)(users_entity_1.default, { id: Number(req.params.id) });
-    if (data) {
-        (0, SuccessResponse_1.default)(res, data, next);
-    }
-    else {
-        (0, notFoundResponse_1.default)(next);
-    }
 });
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { error, value } = validate_1.default.login(req.body);
@@ -59,10 +42,17 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     if (!isValid) {
         return next(new errorHandler_1.ErrorHandler("Login yoki parol xato", 400));
     }
-    const token = jsonwebtoken_1.default.sign(Object.assign({}, user), envconfig_1.default.jwt_secret_key);
+    const token = (0, functions_1.signToken)(user);
+    if (!token) {
+        return next(new errorHandler_1.ErrorHandler("Birozdan so'ng urinib ko'ring", 400));
+    }
     (0, SuccessResponse_1.default)(res, Object.assign(Object.assign({}, user), { token }), next);
 });
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { secretkey } = req.headers;
+    if (!secretkey || secretkey && secretkey != envconfig_1.default.jwt_secret_key) {
+        return next(new errorHandler_1.ErrorHandler("Login yoki parol xato :("));
+    }
     const { error, value } = validate_1.default.register(req.body);
     if (error) {
         (0, validationError_1.default)(res, error, next);
@@ -90,19 +80,20 @@ const put = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     }
     const salt = bcryptjs_1.default.genSaltSync(10);
     value.parol = bcryptjs_1.default.hashSync(value.parol, salt);
-    const updated = yield (0, OrmFn_1.update)(users_entity_1.default, { id: Number(req.params.id) }, value);
+    const { user } = req;
+    const updated = yield (0, OrmFn_1.update)(users_entity_1.default, { id: user.id }, value);
     if (!updated.ok) {
         return next(new errorHandler_1.ErrorHandler(updated.msg, 404));
     }
-    const token = jsonwebtoken_1.default.sign(Object.assign({}, updated.data), envconfig_1.default.jwt_secret_key);
+    const token = (0, functions_1.signToken)(updated.data);
+    if (!token) {
+        return next(new errorHandler_1.ErrorHandler("Birozdan so'ng urinib ko'ring", 400));
+    }
     (0, SuccessResponse_1.default)(res, Object.assign(Object.assign({}, updated.data), { token }), next);
 });
 exports.default = {
     get: (_, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         (0, getCustomParams_1.default)(_, res, next, get);
-    }),
-    getById: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        (0, getCustomParams_1.default)(req, res, next, getById);
     }),
     login: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         (0, getCustomParams_1.default)(req, res, next, login);

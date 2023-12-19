@@ -1,4 +1,4 @@
-import { EntityTarget, FindOptionsWhere } from "typeorm";
+import { EntityTarget, FindOptionsSelect, FindOptionsSelectByString, FindOptionsWhere } from "typeorm";
 import { dataSource } from "../config/ormcongif";
 
 /**
@@ -12,7 +12,8 @@ const findAll = async <T>(
   model: EntityTarget<T>,
   where?: FindOptionsWhere<T>,
   relations?: string[],
-  order?: any
+  order?: any,
+  select?: FindOptionsSelect<T> | FindOptionsSelectByString<T>
 ): Promise<T[]> => {
   try {
     await dataSource
@@ -22,6 +23,7 @@ const findAll = async <T>(
       where,
       relations,
       order,
+      select 
     });
     return value;
   } catch (e) {
