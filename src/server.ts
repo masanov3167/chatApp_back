@@ -1,9 +1,15 @@
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import { ErrorHandle } from "./middleware/ErrorHandle";
+import socket from "./socket";
+import http from "http";
+import ws from "ws"
 
 //express app
 const app: Application = express();
+
+//socket
+import { createServer } from "http";
 
 //set port number
 const PORT = process.env.PORT || 5000;
@@ -12,7 +18,9 @@ const PORT = process.env.PORT || 5000;
 import UserRoutes from "./controller/users/route";
 import { CheckUserId } from "./middleware/checkUserId";
 //connect
-
+const server = http.createServer(app);
+const wss = new ws.Server({ server });
+socket(wss)
 //cors control
 app.use(cors());
 
@@ -33,6 +41,7 @@ app.use("/*", (_: Request, res: Response) =>
     .json({ ok: false, status: 404, message: `path not found ${_.url}` })
 );
 
-app.listen(PORT, (): void => {
-  console.log(`server run port ${PORT}`);
+server.listen(PORT, () =>{
+  console.log(PORT)
 });
+

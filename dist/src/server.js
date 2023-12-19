@@ -6,6 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const ErrorHandle_1 = require("./middleware/ErrorHandle");
+const socket_1 = __importDefault(require("./socket"));
+const http_1 = __importDefault(require("http"));
+const ws_1 = __importDefault(require("ws"));
 //express app
 const app = (0, express_1.default)();
 //set port number
@@ -14,6 +17,9 @@ const PORT = process.env.PORT || 5000;
 const route_1 = __importDefault(require("./controller/users/route"));
 const checkUserId_1 = require("./middleware/checkUserId");
 //connect
+const server = http_1.default.createServer(app);
+const wss = new ws_1.default.Server({ server });
+(0, socket_1.default)(wss);
 //cors control
 app.use((0, cors_1.default)());
 //req body parser to json
@@ -27,6 +33,6 @@ app.use(ErrorHandle_1.ErrorHandle);
 app.use("/*", (_, res) => res
     .status(404)
     .json({ ok: false, status: 404, message: `path not found ${_.url}` }));
-app.listen(PORT, () => {
-    console.log(`server run port ${PORT}`);
+server.listen(PORT, () => {
+    console.log(PORT);
 });
