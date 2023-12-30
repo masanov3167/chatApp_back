@@ -9,11 +9,12 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
   io.on('connection', (socket) => {
     (async() =>{
       let token = socket.handshake.auth?.token["_j"];
+      console.log(token);
       
       if(!token){
         socket.emit("exit");
       }else{
-        const decodedUser = decoderToken(token);
+        const decodedUser = decoderToken(token._j);
         console.log(decodedUser);
         
         if(decodedUser){

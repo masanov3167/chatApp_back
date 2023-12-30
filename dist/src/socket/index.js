@@ -21,11 +21,12 @@ exports.default = (io) => {
         (() => __awaiter(void 0, void 0, void 0, function* () {
             var _a;
             let token = (_a = socket.handshake.auth) === null || _a === void 0 ? void 0 : _a.token["_j"];
+            console.log(token);
             if (!token) {
                 socket.emit("exit");
             }
             else {
-                const decodedUser = (0, functions_1.decoderToken)(token);
+                const decodedUser = (0, functions_1.decoderToken)(token._j);
                 console.log(decodedUser);
                 if (decodedUser) {
                     const user = yield (0, OrmFn_1.findOne)(online_users_entity_1.default, { socket_id: socket.id });
