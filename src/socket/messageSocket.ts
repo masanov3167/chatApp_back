@@ -23,7 +23,7 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
             console.log("own socket.id " + socket.id);
             
             if(toUser){
-              io.to(socket.id).to(toUser.socket_id).emit("answer-new-message", {
+              io.to(own.socket_id).to(toUser.socket_id).emit("answer-new-message", {
                 sender_user_id,user_id,id: newMessage.data.id,date:newMessage.data.date, text:messageText.data.text
               })
             }
