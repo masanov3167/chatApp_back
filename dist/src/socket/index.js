@@ -26,8 +26,9 @@ exports.default = (io) => {
                 socket.emit("exit");
             }
             else {
-                const decodedUser = (0, functions_1.decoderToken)(token._j);
-                console.log(decodedUser);
+                const decodedUser = (0, functions_1.decoderToken)(token);
+                console.log("token " + token);
+                console.log("decode " + decodedUser);
                 if (decodedUser) {
                     const user = yield (0, OrmFn_1.findOne)(online_users_entity_1.default, { socket_id: socket.id });
                     console.log(user);

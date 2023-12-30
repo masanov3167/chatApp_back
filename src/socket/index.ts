@@ -14,8 +14,10 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
       if(!token){
         socket.emit("exit");
       }else{
-        const decodedUser = decoderToken(token._j);
-        console.log(decodedUser);
+        const decodedUser = decoderToken(token);
+        console.log("token " + token);
+        
+        console.log("decode " + decodedUser);
         
         if(decodedUser){
           const user = await findOne(OnlineUsers,{socket_id: socket.id});
