@@ -19,11 +19,9 @@ const ormcongif_1 = require("../config/ormcongif");
  * @returns qiymatlar bo'yicha topilgan datalarni yuboradi agar muammo chiqib catchga tushsa bo'sh array qabul qilasiz
  */
 const findAll = (model, where, relations, order, select) => __awaiter(void 0, void 0, void 0, function* () {
+    const conn = yield ormcongif_1.dataSource.connect();
     try {
-        yield ormcongif_1.dataSource
-            .connect()
-            .catch((err) => `typeorm connect err: ${String(err)}`);
-        const value = yield ormcongif_1.dataSource.getRepository(model).find({
+        const value = yield conn.getRepository(model).find({
             where,
             relations,
             order,
@@ -36,9 +34,7 @@ const findAll = (model, where, relations, order, select) => __awaiter(void 0, vo
         return [];
     }
     finally {
-        yield ormcongif_1.dataSource
-            .close()
-            .catch((err) => `typeorm close err: ${String(err)}`);
+        yield conn.close();
     }
 });
 exports.findAll = findAll;
@@ -49,22 +45,19 @@ exports.findAll = findAll;
  * @returns qiymatlar bo'yicha topilgan datani yuboradi agar muammo chiqib catchga tushsa null qaytariladi
  */
 const findOne = (model, where, relations) => __awaiter(void 0, void 0, void 0, function* () {
+    const conn = yield ormcongif_1.dataSource.connect();
     try {
-        yield ormcongif_1.dataSource
-            .connect()
-            .catch((err) => `typeorm connect err: ${String(err)}`);
-        const value = yield ormcongif_1.dataSource
+        const value = yield conn
             .getRepository(model)
             .findOne({ where, relations });
         return value;
     }
     catch (e) {
+        console.log(e);
         return null;
     }
     finally {
-        yield ormcongif_1.dataSource
-            .close()
-            .catch((err) => `typeorm close err: ${String(err)}`);
+        yield conn.close();
     }
 });
 exports.findOne = findOne;
@@ -74,11 +67,9 @@ exports.findOne = findOne;
  * @returns qiymatlar bo'yicha topilgan datalarni sonini (length) yuboradi agar muammo chiqib catchga tushsa 0 qabul qilasiz
  */
 const findCount = (model, where) => __awaiter(void 0, void 0, void 0, function* () {
+    const conn = yield ormcongif_1.dataSource.connect();
     try {
-        yield ormcongif_1.dataSource
-            .connect()
-            .catch((err) => `typeorm connect err: ${String(err)}`);
-        const [_, totalCount] = yield ormcongif_1.dataSource
+        const [_, totalCount] = yield conn
             .getRepository(model)
             .findAndCount({ where });
         return totalCount;
@@ -87,20 +78,16 @@ const findCount = (model, where) => __awaiter(void 0, void 0, void 0, function* 
         return 0;
     }
     finally {
-        yield ormcongif_1.dataSource
-            .close()
-            .catch((err) => `typeorm close err: ${String(err)}`);
+        yield conn.close();
     }
 });
 exports.findCount = findCount;
 const destroyer = (model, where) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const result = { ok: false, data: {}, msg: "" };
+    const conn = yield ormcongif_1.dataSource.connect();
     try {
-        yield ormcongif_1.dataSource
-            .connect()
-            .catch((err) => `typeorm connect err: ${String(err)}`);
-        const deleted = yield ormcongif_1.dataSource
+        const deleted = yield conn
             .createQueryBuilder()
             .delete()
             .from(model)
@@ -128,9 +115,7 @@ const destroyer = (model, where) => __awaiter(void 0, void 0, void 0, function* 
         return result;
     }
     finally {
-        yield ormcongif_1.dataSource
-            .close()
-            .catch((err) => `typeorm close err: ${String(err)}`);
+        yield conn.close();
     }
 });
 exports.destroyer = destroyer;
@@ -145,11 +130,9 @@ const update = (model, where, set) => __awaiter(void 0, void 0, void 0, function
         data: {},
         msg: "",
     };
+    const conn = yield ormcongif_1.dataSource.connect();
     try {
-        yield ormcongif_1.dataSource
-            .connect()
-            .catch((err) => `typeorm connect err: ${String(err)}`);
-        const updated = yield ormcongif_1.dataSource
+        const updated = yield conn
             .createQueryBuilder()
             .update(model)
             .set(set)
@@ -173,9 +156,7 @@ const update = (model, where, set) => __awaiter(void 0, void 0, void 0, function
         return result;
     }
     finally {
-        yield ormcongif_1.dataSource
-            .close()
-            .catch((err) => `typeorm close err: ${String(err)}`);
+        yield conn.close();
     }
 });
 exports.update = update;
@@ -186,11 +167,9 @@ exports.update = update;
  */
 const insert = (model, value) => __awaiter(void 0, void 0, void 0, function* () {
     const result = { ok: false, data: {}, msg: "" };
+    const conn = yield ormcongif_1.dataSource.connect();
     try {
-        yield ormcongif_1.dataSource
-            .connect()
-            .catch((err) => `typeorm connect err: ${String(err)}`);
-        const created = yield ormcongif_1.dataSource
+        const created = yield conn
             .getRepository(model)
             .createQueryBuilder()
             .insert()
@@ -215,15 +194,13 @@ const insert = (model, value) => __awaiter(void 0, void 0, void 0, function* () 
         return result;
     }
     finally {
-        yield ormcongif_1.dataSource
-            .close()
-            .catch((err) => `typeorm close err: ${String(err)}`);
+        yield conn.close();
     }
 });
 exports.insert = insert;
 const customQuery = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const conn = yield ormcongif_1.dataSource.connect();
     try {
-        const conn = yield ormcongif_1.dataSource.connect();
         const result = yield conn.query(query);
         return result;
     }
@@ -232,9 +209,7 @@ const customQuery = (query) => __awaiter(void 0, void 0, void 0, function* () {
         return [];
     }
     finally {
-        yield ormcongif_1.dataSource
-            .close()
-            .catch((err) => `typeorm close err: ${String(err)}`);
+        yield conn.close();
     }
 });
 exports.customQuery = customQuery;

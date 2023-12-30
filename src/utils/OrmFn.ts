@@ -15,11 +15,9 @@ const findAll = async <T>(
   order?: any,
   select?: FindOptionsSelect<T> | FindOptionsSelectByString<T>,
 ): Promise<T[]> => {
+  const conn = await dataSource.connect()
   try {
-    await dataSource
-      .connect()
-      .catch((err) => `typeorm connect err: ${String(err)}`);
-    const value = await dataSource.getRepository(model).find({
+    const value = await conn.getRepository(model).find({
       where,
       relations,
       order,
@@ -31,9 +29,7 @@ const findAll = async <T>(
     
     return [];
   } finally {
-    await dataSource
-      .close()
-      .catch((err) => `typeorm close err: ${String(err)}`);
+    await conn.close()
   }
 };
 
@@ -48,20 +44,18 @@ const findOne = async <T>(
   where: FindOptionsWhere<T>,
   relations?: string[]
 ): Promise<T> => {
+  const conn = await dataSource.connect();
   try {
-    await dataSource
-      .connect()
-      .catch((err) => `typeorm connect err: ${String(err)}`);
-    const value = await dataSource
+    const value = await conn
       .getRepository(model)
       .findOne({ where, relations });
     return value;
   } catch (e) {
+    console.log(e);
+    
     return null;
   } finally {
-    await dataSource
-      .close()
-      .catch((err) => `typeorm close err: ${String(err)}`);
+    await conn.close()
   }
 };
 
@@ -74,20 +68,16 @@ const findCount = async <T>(
   model: EntityTarget<T>,
   where: FindOptionsWhere<T>
 ): Promise<number> => {
+  const conn = await dataSource.connect()
   try {
-    await dataSource
-      .connect()
-      .catch((err) => `typeorm connect err: ${String(err)}`);
-    const [_, totalCount] = await dataSource
+    const [_, totalCount] = await conn
       .getRepository(model)
       .findAndCount({ where });
     return totalCount;
   } catch (e) {
     return 0;
   } finally {
-    await dataSource
-      .close()
-      .catch((err) => `typeorm close err: ${String(err)}`);
+    await conn.close()
   }
 };
 
@@ -102,11 +92,9 @@ const destroyer = async <T>(
   where: FindOptionsWhere<T>
 ) => {
   const result: ormFunctionsReturnResultType = { ok: false, data: {}, msg: "" };
+  const conn = await dataSource.connect()
   try {
-    await dataSource
-      .connect()
-      .catch((err) => `typeorm connect err: ${String(err)}`);
-    const deleted = await dataSource
+    const deleted = await conn
       .createQueryBuilder()
       .delete()
       .from(model)
@@ -138,9 +126,7 @@ const destroyer = async <T>(
     }
     return result;
   } finally {
-    await dataSource
-      .close()
-      .catch((err) => `typeorm close err: ${String(err)}`);
+    await conn.close()
   }
 };
 
@@ -159,11 +145,9 @@ const update = async <T>(
     data: {},
     msg: "",
   };
+  const conn = await dataSource.connect()
   try {
-    await dataSource
-      .connect()
-      .catch((err) => `typeorm connect err: ${String(err)}`);
-    const updated = await dataSource
+    const updated = await conn
       .createQueryBuilder()
       .update(model)
       .set(set)
@@ -186,9 +170,7 @@ const update = async <T>(
     result.msg = String(e).substring(400);
     return result;
   } finally {
-    await dataSource
-      .close()
-      .catch((err) => `typeorm close err: ${String(err)}`);
+    await conn.close()
   }
 };
 
@@ -199,11 +181,9 @@ const update = async <T>(
  */
 const insert = async <T>(model: EntityTarget<T>, value: any) => {
   const result: ormFunctionsReturnResultType = { ok: false, data: {}, msg: "" };
+  const conn = await dataSource.connect()
   try {
-    await dataSource
-      .connect()
-      .catch((err) => `typeorm connect err: ${String(err)}`);
-    const created = await dataSource
+    const created = await conn
       .getRepository(model)
       .createQueryBuilder()
       .insert()
@@ -230,24 +210,20 @@ const insert = async <T>(model: EntityTarget<T>, value: any) => {
     result.data = null;
     return result;
   } finally {
-    await dataSource
-      .close()
-      .catch((err) => `typeorm close err: ${String(err)}`);
+    await conn.close();
   }
 };
 
 const customQuery = async (query: string) => {
+  const conn = await dataSource.connect() 
   try{
-    const conn = await dataSource.connect() 
     const result = await conn.query(query);
     return result
   }catch(e){
     console.log(JSON.stringify(e));
     return []
   }finally{
-    await dataSource
-      .close()
-      .catch((err) => `typeorm close err: ${String(err)}`);
+    await conn.close();
   }
 }
 

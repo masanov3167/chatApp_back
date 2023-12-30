@@ -8,7 +8,7 @@ class OnlineUsers {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({type:"string", nullable:false})
+  @Column({type:"varchar", nullable:false})
   socket_id: string;
 
   @Column({type:"number", nullable:false})
