@@ -36,10 +36,14 @@ exports.default = (io) => {
         }))();
         (0, messageSocket_1.default)(io, socket);
         socket.on("disconnect", () => {
-            console.log("disconnect bo'ldi " + socket.id + JSON.stringify(socket));
+            console.log("disconnect bo'ldi " + socket.id);
             (() => __awaiter(void 0, void 0, void 0, function* () {
+                console.log("bu yergacha keldi");
                 yield (0, OrmFn_1.destroyer)(online_users_entity_1.default, { socket_id: socket.id });
             }))();
         });
+    });
+    io.on("disconnect", socket => {
+        console.log(socket.id + " bu yerda nima chiqar ekan");
     });
 };

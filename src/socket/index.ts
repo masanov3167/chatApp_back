@@ -24,11 +24,16 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
     messageSocket(io, socket)
 
     socket.on("disconnect", () =>{
-      console.log("disconnect bo'ldi " + socket.id + JSON.stringify(socket));
+      console.log("disconnect bo'ldi " + socket.id);
       
       (async() =>{
+        console.log("bu yergacha keldi");
+        
         await destroyer(OnlineUsers,{socket_id: socket.id})
       })()
     })
+  })
+  io.on("disconnect", socket =>{
+    console.log(socket.id + " bu yerda nima chiqar ekan");
   })
 };
