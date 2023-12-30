@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const users_entity_1 = __importDefault(require("./users.entity"));
+const text_messages_entity_1 = __importDefault(require("./text.messages.entity"));
 let Messages = class Messages {
 };
 __decorate([
@@ -42,6 +43,11 @@ __decorate([
     (0, typeorm_1.JoinColumn)({ name: 'user_id', referencedColumnName: 'id' }),
     __metadata("design:type", users_entity_1.default)
 ], Messages.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.OneToOne)(() => text_messages_entity_1.default, textMessage => textMessage.message),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", text_messages_entity_1.default)
+], Messages.prototype, "text", void 0);
 Messages = __decorate([
     (0, typeorm_1.Entity)({
         name: "chat_messages"

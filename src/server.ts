@@ -9,6 +9,7 @@ const app: Application = express();
 const PORT = process.env.PORT || 5000;
 
 import UserRoutes from "./controller/users/route";
+import MessageRoutes from "./controller/messages/route";
 import { CheckUserId } from "./middleware/checkUserId";
 import socket from "./socket";
 
@@ -16,6 +17,7 @@ import socket from "./socket";
 app.use(cors());
 app.use(express.json());
 app.use("/users", UserRoutes);
+app.use("/messages", MessageRoutes);
 app.use(CheckUserId);
 app.use(ErrorHandle);
 

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insert = exports.update = exports.destroyer = exports.findCount = exports.findOne = exports.findAll = void 0;
+exports.customQuery = exports.insert = exports.update = exports.destroyer = exports.findCount = exports.findOne = exports.findAll = void 0;
 const ormcongif_1 = require("../config/ormcongif");
 /**
  *
@@ -27,7 +27,7 @@ const findAll = (model, where, relations, order, select) => __awaiter(void 0, vo
             where,
             relations,
             order,
-            select
+            select,
         });
         return value;
     }
@@ -221,3 +221,20 @@ const insert = (model, value) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.insert = insert;
+const customQuery = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const conn = yield ormcongif_1.dataSource.connect();
+        const result = yield conn.query(query);
+        return result;
+    }
+    catch (e) {
+        console.log(JSON.stringify(e));
+        return [];
+    }
+    finally {
+        yield ormcongif_1.dataSource
+            .close()
+            .catch((err) => `typeorm close err: ${String(err)}`);
+    }
+});
+exports.customQuery = customQuery;

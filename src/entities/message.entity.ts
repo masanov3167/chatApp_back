@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import Users from './users.entity';
+import TextMessages from './text.messages.entity';
 
 @Entity({
   name:"chat_messages"
@@ -24,6 +25,10 @@ class Messages {
   @ManyToOne(() => Users)
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: Users;
+
+  @OneToOne(() => TextMessages, textMessage => textMessage.message)
+  @JoinColumn()
+  text: TextMessages;
 }
 
 export default Messages

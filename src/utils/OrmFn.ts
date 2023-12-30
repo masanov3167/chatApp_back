@@ -13,7 +13,7 @@ const findAll = async <T>(
   where?: FindOptionsWhere<T>,
   relations?: string[],
   order?: any,
-  select?: FindOptionsSelect<T> | FindOptionsSelectByString<T>
+  select?: FindOptionsSelect<T> | FindOptionsSelectByString<T>,
 ): Promise<T[]> => {
   try {
     await dataSource
@@ -23,7 +23,7 @@ const findAll = async <T>(
       where,
       relations,
       order,
-      select 
+      select,
     });
     return value;
   } catch (e) {
@@ -236,4 +236,19 @@ const insert = async <T>(model: EntityTarget<T>, value: any) => {
   }
 };
 
-export { findAll, findOne, findCount, destroyer, update, insert };
+const customQuery = async (query: string) => {
+  try{
+    const conn = await dataSource.connect() 
+    const result = await conn.query(query);
+    return result
+  }catch(e){
+    console.log(JSON.stringify(e));
+    return []
+  }finally{
+    await dataSource
+      .close()
+      .catch((err) => `typeorm close err: ${String(err)}`);
+  }
+}
+
+export { findAll, findOne, findCount, destroyer, update, insert, customQuery };
