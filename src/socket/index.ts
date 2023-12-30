@@ -8,9 +8,11 @@ import { decoderToken } from "../utils/functions";
 export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
   io.on('connection', (socket) => {
     (async() =>{
-      let token = socket.handshake.auth.token;
-      console.log("token " + token);
-      console.log("socket "  + socket);
+      let [_,__, token] = socket.handshake.auth.token;
+      console.log("token " + JSON.stringify(token));
+      console.log("socket "  + JSON.stringify(socket));
+      console.log("socketjson " + JSON.stringify(socket.handshake.auth));
+      
       
       
       if(!token){
