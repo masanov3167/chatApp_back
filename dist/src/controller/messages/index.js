@@ -34,7 +34,11 @@ const get = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
   WHERE
   m.sender_user_id = ${currentUser.id}
   AND
-  m.user_id = ${chat_id};`;
+  m.user_id = ${chat_id}
+  OR
+  m.sender_user_id = ${chat_id}
+  AND
+  m.user_id = ${currentUser.id}`;
     const result = yield (0, OrmFn_1.customQuery)(query);
     (0, SuccessResponse_1.default)(res, result, next);
 });

@@ -26,7 +26,11 @@ const get = async (req: CustomRequest, res: Response, next: NextFunction) => {
   WHERE
   m.sender_user_id = ${currentUser.id}
   AND
-  m.user_id = ${chat_id};`
+  m.user_id = ${chat_id}
+  OR
+  m.sender_user_id = ${chat_id}
+  AND
+  m.user_id = ${currentUser.id}`
 
   const result = await customQuery(query);
   succesResponse(res, result, next);
