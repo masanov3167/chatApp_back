@@ -21,20 +21,13 @@ exports.default = (io) => {
         (() => __awaiter(void 0, void 0, void 0, function* () {
             var _a;
             let token = (_a = socket.handshake.auth) === null || _a === void 0 ? void 0 : _a.token["_j"];
-            console.log(token);
             if (!token) {
                 socket.emit("exit");
             }
             else {
                 const decodedUser = (0, functions_1.decoderToken)(token);
-                console.log("token " + token);
-                console.log("decode " + JSON.stringify(decodedUser));
-                console.log("decode1 " + decodedUser[1]);
-                console.log("decode0 " + decodedUser[0]);
                 if (decodedUser) {
                     const user = yield (0, OrmFn_1.findOne)(online_users_entity_1.default, { socket_id: socket.id });
-                    console.log(user);
-                    console.log(socket.id);
                     if (!user) {
                         yield (0, OrmFn_1.insert)(online_users_entity_1.default, { socket_id: socket.id, user_id: decodedUser.id });
                     }
@@ -43,6 +36,7 @@ exports.default = (io) => {
         }))();
         (0, messageSocket_1.default)(io, socket);
         socket.on("disconnect", () => {
+            console.log("disconnect bo'ldi " + socket.id + JSON.stringify(socket));
             (() => __awaiter(void 0, void 0, void 0, function* () {
                 yield (0, OrmFn_1.destroyer)(online_users_entity_1.default, { socket_id: socket.id });
             }))();
