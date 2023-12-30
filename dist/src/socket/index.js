@@ -19,7 +19,7 @@ const functions_1 = require("../utils/functions");
 exports.default = (io) => {
     io.on('connection', (socket) => {
         (() => __awaiter(void 0, void 0, void 0, function* () {
-            let [_, __, token] = socket.handshake.auth.token;
+            let token = socket.handshake.auth.token;
             console.log("token " + JSON.stringify(token));
             console.log("socket " + JSON.stringify(socket));
             console.log("socketjson " + JSON.stringify(socket.handshake.auth));
