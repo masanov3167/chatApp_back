@@ -7,6 +7,7 @@ import { decoderToken } from "../utils/functions";
 
 export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
   io.on('connection', (socket) => {
+    console.log("connect bo'ldi " + socket.id);
     (async() =>{
       let token = socket.handshake.auth?.token["_j"];      
       if(!token){
@@ -27,13 +28,17 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
       console.log("disconnect bo'ldi " + socket.id);
       
       (async() =>{
-        console.log("bu yergacha keldi");
-        
-        await destroyer(OnlineUsers,{socket_id: socket.id})
+        let token = socket.handshake.auth?.token["_j"];      
+        if(!token){
+          socket.emit("exit");
+        }else{
+          const decodedUser = decoderToken(token);
+          if(decodedUser){
+            console.log("user disconnect ichida " + JSON.stringify(decodedUser));
+            
+          }
+        }
       })()
     })
-  })
-  io.on("disconnect", socket =>{
-    console.log(socket.id + " bu yerda nima chiqar ekan");
   })
 };

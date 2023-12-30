@@ -18,6 +18,7 @@ const online_users_entity_1 = __importDefault(require("../entities/online.users.
 const functions_1 = require("../utils/functions");
 exports.default = (io) => {
     io.on('connection', (socket) => {
+        console.log("connect bo'ldi " + socket.id);
         (() => __awaiter(void 0, void 0, void 0, function* () {
             var _a;
             let token = (_a = socket.handshake.auth) === null || _a === void 0 ? void 0 : _a.token["_j"];
@@ -38,12 +39,18 @@ exports.default = (io) => {
         socket.on("disconnect", () => {
             console.log("disconnect bo'ldi " + socket.id);
             (() => __awaiter(void 0, void 0, void 0, function* () {
-                console.log("bu yergacha keldi");
-                yield (0, OrmFn_1.destroyer)(online_users_entity_1.default, { socket_id: socket.id });
+                var _a;
+                let token = (_a = socket.handshake.auth) === null || _a === void 0 ? void 0 : _a.token["_j"];
+                if (!token) {
+                    socket.emit("exit");
+                }
+                else {
+                    const decodedUser = (0, functions_1.decoderToken)(token);
+                    if (decodedUser) {
+                        console.log("user disconnect ichida " + JSON.stringify(decodedUser));
+                    }
+                }
             }))();
         });
-    });
-    io.on("disconnect", socket => {
-        console.log(socket.id + " bu yerda nima chiqar ekan");
     });
 };
