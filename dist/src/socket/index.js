@@ -20,13 +20,17 @@ exports.default = (io) => {
     io.on('connection', (socket) => {
         (() => __awaiter(void 0, void 0, void 0, function* () {
             let token = socket.handshake.auth.token;
+            console.log(token);
             if (!token) {
                 socket.emit("exit");
             }
             else {
                 const decodedUser = (0, functions_1.decoderToken)(token);
+                console.log(decodedUser);
                 if (decodedUser) {
                     const user = yield (0, OrmFn_1.findOne)(online_users_entity_1.default, { socket_id: socket.id });
+                    console.log(user);
+                    console.log(socket.id);
                     if (!user) {
                         yield (0, OrmFn_1.insert)(online_users_entity_1.default, { socket_id: socket.id, user_id: decodedUser.id });
                     }

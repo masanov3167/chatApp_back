@@ -9,12 +9,20 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
   io.on('connection', (socket) => {
     (async() =>{
       let token = socket.handshake.auth.token;
+      console.log(token);
+      
       if(!token){
         socket.emit("exit");
       }else{
         const decodedUser = decoderToken(token);
+        console.log(decodedUser);
+        
         if(decodedUser){
           const user = await findOne(OnlineUsers,{socket_id: socket.id});
+          console.log(user);
+          console.log(socket.id);
+          
+          
           if(!user){
             await insert(OnlineUsers,{socket_id: socket.id, user_id: decodedUser.id})
           }
