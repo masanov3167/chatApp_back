@@ -18,6 +18,10 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
           const messageText = await insert(TextMessages, {message_id:newMessage.data.id,text});
           if(messageText.ok){
             const toUser = await findOne(OnlineUsers,{user_id: user_id});
+            const own = await findOne(OnlineUsers, {user_id: sender_user_id});
+            console.log("own", own);
+            console.log("own socket.id " + socket.id);
+            
             if(toUser){
               io.to(socket.id).to(toUser.socket_id).emit("answer-new-message", {
                 sender_user_id,user_id,id: newMessage.data.id,date:newMessage.data.date, text:messageText.data.text
