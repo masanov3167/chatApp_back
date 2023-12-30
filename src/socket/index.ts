@@ -9,7 +9,9 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
   io.on('connection', (socket) => {
     (async() =>{
       let token = socket.handshake.auth.token;
-      console.log(token);
+      console.log("token " + token);
+      console.log("socket "  + socket);
+      
       
       if(!token){
         socket.emit("exit");
