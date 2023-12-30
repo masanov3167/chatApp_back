@@ -17,7 +17,10 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
         const decodedUser = decoderToken(token);
         console.log("token " + token);
         
-        console.log("decode " + decodedUser);
+        console.log("decode " + JSON.stringify(decodedUser));
+        console.log("decode1 " + decodedUser[1]);
+        console.log("decode0 " + decodedUser[0]);
+        
         
         if(decodedUser){
           const user = await findOne(OnlineUsers,{socket_id: socket.id});
