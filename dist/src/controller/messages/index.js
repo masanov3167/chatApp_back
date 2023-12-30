@@ -30,7 +30,11 @@ const get = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
   INNER JOIN 
   chat_text_messages t 
   ON 
-  m.id = t.message_id;`;
+  m.id = t.message_id 
+  WHERE
+  m.sender_user_id = ${currentUser.id}
+  AND
+  m.user_id = ${chat_id};`;
     const result = yield (0, OrmFn_1.customQuery)(query);
     (0, SuccessResponse_1.default)(res, result, next);
 });

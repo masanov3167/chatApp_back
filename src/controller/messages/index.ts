@@ -22,7 +22,12 @@ const get = async (req: CustomRequest, res: Response, next: NextFunction) => {
   INNER JOIN 
   chat_text_messages t 
   ON 
-  m.id = t.message_id;`
+  m.id = t.message_id 
+  WHERE
+  m.sender_user_id = ${currentUser.id}
+  AND
+  m.user_id = ${chat_id};`
+
   const result = await customQuery(query);
   succesResponse(res, result, next);
 };
