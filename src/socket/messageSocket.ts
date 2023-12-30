@@ -1,8 +1,9 @@
 import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { insert } from "../utils/OrmFn";
+import { findOne, insert } from "../utils/OrmFn";
 import Messages from "../entities/message.entity";
 import TextMessages from "../entities/text.messages.entity";
+import OnlineUsers from "../entities/online.users.entity";
 
 export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>, socket : Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
   try {
@@ -16,9 +17,12 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
         if(newMessage.ok){
           const messageText = await insert(TextMessages, {message_id:newMessage.data.id,text});
           if(messageText.ok){
-            io.to(user_id).to(sender_user_id).emit("answer-new-message", {
-              sender_user_id,user_id,id: newMessage.data.id,date:newMessage.data.date, text:messageText.data.text
-            })
+            const toUser = await findOne(OnlineUsers,{user_id: user_id});
+            if(toUser){
+              io.to(socket.id).to(toUser.socket_id).emit("answer-new-message", {
+                sender_user_id,user_id,id: newMessage.data.id,date:newMessage.data.date, text:messageText.data.text
+              })
+            }
           }
         }
       })
