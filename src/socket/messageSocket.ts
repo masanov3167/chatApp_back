@@ -16,7 +16,7 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
         if(newMessage.ok){
           const messageText = await insert(TextMessages, {message_id:newMessage.data.id,text});
           if(messageText.ok){
-            io.emit("answer-new-message", {
+            io.to(user_id).to(sender_user_id).emit("answer-new-message", {
               sender_user_id,user_id,id: newMessage.data.id,date:newMessage.data.date, text:messageText.data.text
             })
           }
