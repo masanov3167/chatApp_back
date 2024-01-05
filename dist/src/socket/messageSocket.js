@@ -29,12 +29,14 @@ exports.default = (io, socket) => {
                 const messageText = yield (0, OrmFn_1.insert)(text_messages_entity_1.default, { message_id: newMessage.data.id, text });
                 if (messageText.ok) {
                     const toUser = yield (0, OrmFn_1.findOne)(online_users_entity_1.default, { user_id: user_id });
-                    const own = yield (0, OrmFn_1.findOne)(online_users_entity_1.default, { user_id: sender_user_id });
-                    console.log("own", own);
-                    console.log("own socket.id " + socket.id);
+                    console.log(toUser);
                     if (toUser) {
-                        io.to(own.socket_id).to(toUser.socket_id).emit("answer-new-message", {
-                            sender_user_id, user_id, id: newMessage.data.id, date: newMessage.data.date, text: messageText.data.text
+                        io.to(socket.id).to(toUser.socket_id).emit("answer-new-message", {
+                            sender_user_id,
+                            user_id,
+                            id: newMessage.data.id,
+                            date: newMessage.data.date,
+                            text: messageText.data.text
                         });
                     }
                 }
