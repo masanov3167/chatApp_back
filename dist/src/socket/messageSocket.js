@@ -30,14 +30,18 @@ exports.default = (io, socket) => {
                 if (messageText.ok) {
                     const toUser = yield (0, OrmFn_1.findOne)(online_users_entity_1.default, { user_id: user_id });
                     console.log(toUser);
+                    const message = {
+                        sender_user_id,
+                        user_id,
+                        id: newMessage.data.id,
+                        date: newMessage.data.date,
+                        text: messageText.data.text
+                    };
                     if (toUser) {
-                        io.to(socket.id).to(toUser.socket_id).emit("answer-new-message", {
-                            sender_user_id,
-                            user_id,
-                            id: newMessage.data.id,
-                            date: newMessage.data.date,
-                            text: messageText.data.text
-                        });
+                        io.to(socket.id).to(toUser.socket_id).emit("answer-new-message", message);
+                    }
+                    else {
+                        io.to(socket.id).emit("answer-new-message", message);
                     }
                 }
             }
