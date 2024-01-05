@@ -18,14 +18,18 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
           if(!user){
             await insert(OnlineUsers,{socket_id: socket.id, user_id: decodedUser.id})
           }else{
-            await update(OnlineUsers,{socket_id: socket.id}, {socket_id: socket.id})
+            await update(OnlineUsers,{user_id: decodedUser.id}, {socket_id: socket.id})
           }
         }
       }
-    })()
+    })();
+    console.log("connection bo'ldi ", socket.id);
+    
     messageSocket(io, socket)
 
-    socket.on("disconnect", () =>{      
+    socket.on("disconnect", () =>{   
+      console.log("disconnect bo'ldi", socket.id);
+         
       (async() =>{
        await destroyer(OnlineUsers, {socket_id: socket.id})
       })()

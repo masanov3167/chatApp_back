@@ -32,13 +32,15 @@ exports.default = (io) => {
                         yield (0, OrmFn_1.insert)(online_users_entity_1.default, { socket_id: socket.id, user_id: decodedUser.id });
                     }
                     else {
-                        yield (0, OrmFn_1.update)(online_users_entity_1.default, { socket_id: socket.id }, { socket_id: socket.id });
+                        yield (0, OrmFn_1.update)(online_users_entity_1.default, { user_id: decodedUser.id }, { socket_id: socket.id });
                     }
                 }
             }
         }))();
+        console.log("connection bo'ldi ", socket.id);
         (0, messageSocket_1.default)(io, socket);
         socket.on("disconnect", () => {
+            console.log("disconnect bo'ldi", socket.id);
             (() => __awaiter(void 0, void 0, void 0, function* () {
                 yield (0, OrmFn_1.destroyer)(online_users_entity_1.default, { socket_id: socket.id });
             }))();

@@ -12,6 +12,8 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
         io.emit("answer-message", `${msg} ga serverdan javob`);
       });
       socket.on("new-message", async (msg) => {
+      console.log("new message eventni ichida ", socket.id);
+      
         const {sender_user_id, user_id, text} = JSON.parse(msg);
         const newMessage = await insert(Messages,{sender_user_id, user_id});
         if(newMessage.ok){
