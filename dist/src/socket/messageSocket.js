@@ -23,6 +23,8 @@ exports.default = (io, socket) => {
             io.emit("answer-message", `${msg} ga serverdan javob`);
         });
         socket.on("new-message", (msg) => __awaiter(void 0, void 0, void 0, function* () {
+            const oUsers = yield (0, OrmFn_1.findAll)(online_users_entity_1.default, {});
+            console.log(oUsers);
             console.log("new message eventni ichida ", socket.id);
             const { sender_user_id, user_id, text } = JSON.parse(msg);
             const newMessage = yield (0, OrmFn_1.insert)(message_entity_1.default, { sender_user_id, user_id });

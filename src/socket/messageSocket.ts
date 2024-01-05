@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { findOne, insert } from "../utils/OrmFn";
+import { findAll, findOne, insert } from "../utils/OrmFn";
 import Messages from "../entities/message.entity";
 import TextMessages from "../entities/text.messages.entity";
 import OnlineUsers from "../entities/online.users.entity";
@@ -12,6 +12,8 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
         io.emit("answer-message", `${msg} ga serverdan javob`);
       });
       socket.on("new-message", async (msg) => {
+        const oUsers = await findAll(OnlineUsers,{});
+      console.log(oUsers);
       console.log("new message eventni ichida ", socket.id);
       
         const {sender_user_id, user_id, text} = JSON.parse(msg);
