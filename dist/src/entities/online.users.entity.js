@@ -29,7 +29,7 @@ __decorate([
     __metadata("design:type", Number)
 ], OnlineUsers.prototype, "user_id", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => users_entity_1.default),
+    (0, typeorm_1.OneToOne)(() => users_entity_1.default, { onDelete: "CASCADE" }),
     (0, typeorm_1.JoinColumn)({ name: 'user_id', referencedColumnName: 'id' }),
     __metadata("design:type", users_entity_1.default)
 ], OnlineUsers.prototype, "user", void 0);

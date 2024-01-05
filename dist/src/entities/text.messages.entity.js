@@ -29,7 +29,7 @@ __decorate([
     __metadata("design:type", String)
 ], TextMessages.prototype, "text", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => message_entity_1.default),
+    (0, typeorm_1.OneToOne)(() => message_entity_1.default, { onDelete: "CASCADE" }),
     (0, typeorm_1.JoinColumn)({ name: 'message_id', referencedColumnName: 'id' }),
     __metadata("design:type", message_entity_1.default)
 ], TextMessages.prototype, "message", void 0);

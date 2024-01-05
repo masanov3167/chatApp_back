@@ -14,7 +14,7 @@ class TextMessages {
   @Column()
   text: string;
 
-  @OneToOne(() => Messages)
+  @OneToOne(() => Messages, {onDelete: "CASCADE"})
   @JoinColumn({ name: 'message_id', referencedColumnName: 'id' })
   message: Messages;
 }

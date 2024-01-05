@@ -18,21 +18,13 @@ const text_messages_entity_1 = __importDefault(require("../entities/text.message
 const online_users_entity_1 = __importDefault(require("../entities/online.users.entity"));
 exports.default = (io, socket) => {
     try {
-        socket.on("message", (msg) => {
-            console.log(`Message: ${msg}`);
-            io.emit("answer-message", `${msg} ga serverdan javob`);
-        });
         socket.on("new-message", (msg) => __awaiter(void 0, void 0, void 0, function* () {
-            const oUsers = yield (0, OrmFn_1.findAll)(online_users_entity_1.default, {});
-            console.log(oUsers);
-            console.log("new message eventni ichida ", socket.id);
             const { sender_user_id, user_id, text } = JSON.parse(msg);
             const newMessage = yield (0, OrmFn_1.insert)(message_entity_1.default, { sender_user_id, user_id });
             if (newMessage.ok) {
                 const messageText = yield (0, OrmFn_1.insert)(text_messages_entity_1.default, { message_id: newMessage.data.id, text });
                 if (messageText.ok) {
                     const toUser = yield (0, OrmFn_1.findOne)(online_users_entity_1.default, { user_id: user_id });
-                    console.log(toUser);
                     const message = {
                         sender_user_id,
                         user_id,

@@ -34,17 +34,17 @@ __decorate([
     __metadata("design:type", Number)
 ], Messages.prototype, "user_id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_entity_1.default),
+    (0, typeorm_1.ManyToOne)(() => users_entity_1.default, { onDelete: "CASCADE" }),
     (0, typeorm_1.JoinColumn)({ name: 'sender_user_id', referencedColumnName: 'id' }),
     __metadata("design:type", users_entity_1.default)
 ], Messages.prototype, "senderUser", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_entity_1.default),
+    (0, typeorm_1.ManyToOne)(() => users_entity_1.default, { onDelete: "CASCADE" }),
     (0, typeorm_1.JoinColumn)({ name: 'user_id', referencedColumnName: 'id' }),
     __metadata("design:type", users_entity_1.default)
 ], Messages.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => text_messages_entity_1.default, textMessage => textMessage.message),
+    (0, typeorm_1.OneToOne)(() => text_messages_entity_1.default, textMessage => textMessage.message, { onDelete: "SET NULL" }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", text_messages_entity_1.default)
 ], Messages.prototype, "text", void 0);

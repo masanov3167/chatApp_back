@@ -14,7 +14,7 @@ class OnlineUsers {
   @Column({type:"number", nullable:false})
   user_id: number;
 
-  @OneToOne(() => Users)
+  @OneToOne(() => Users, {onDelete:"CASCADE"})
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: Users;
 }

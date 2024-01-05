@@ -18,15 +18,15 @@ class Messages {
   @Column({type:"number", nullable:false})
   user_id: number;
 
-  @ManyToOne(() => Users)
+  @ManyToOne(() => Users, {onDelete:"CASCADE"})
   @JoinColumn({ name: 'sender_user_id', referencedColumnName: 'id' })
   senderUser: Users;
 
-  @ManyToOne(() => Users)
+  @ManyToOne(() => Users, {onDelete:"CASCADE"})
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: Users;
 
-  @OneToOne(() => TextMessages, textMessage => textMessage.message)
+  @OneToOne(() => TextMessages, textMessage => textMessage.message, {onDelete:"SET NULL"})
   @JoinColumn()
   text: TextMessages;
 }

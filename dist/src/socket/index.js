@@ -37,13 +37,10 @@ exports.default = (io) => {
                 }
             }
         }))();
-        console.log("connection bo'ldi ", socket.id);
         (0, messageSocket_1.default)(io, socket);
         socket.on("disconnect", () => {
-            console.log("disconnect bo'ldi", socket.id);
             (() => __awaiter(void 0, void 0, void 0, function* () {
-                const destroyResult = yield (0, OrmFn_1.destroyer)(online_users_entity_1.default, { socket_id: socket.id });
-                console.log("dResult", destroyResult);
+                yield (0, OrmFn_1.destroyer)(online_users_entity_1.default, { socket_id: socket.id });
             }))();
         });
     });
