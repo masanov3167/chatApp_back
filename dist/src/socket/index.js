@@ -27,7 +27,7 @@ exports.default = (io) => {
             else {
                 const decodedUser = (0, functions_1.decoderToken)(token);
                 if (decodedUser) {
-                    const user = yield (0, OrmFn_1.findOne)(online_users_entity_1.default, { socket_id: socket.id });
+                    const user = yield (0, OrmFn_1.findOne)(online_users_entity_1.default, { user_id: decodedUser.id });
                     if (!user) {
                         yield (0, OrmFn_1.insert)(online_users_entity_1.default, { socket_id: socket.id, user_id: decodedUser.id });
                     }
@@ -42,7 +42,8 @@ exports.default = (io) => {
         socket.on("disconnect", () => {
             console.log("disconnect bo'ldi", socket.id);
             (() => __awaiter(void 0, void 0, void 0, function* () {
-                yield (0, OrmFn_1.destroyer)(online_users_entity_1.default, { socket_id: socket.id });
+                const destroyResult = yield (0, OrmFn_1.destroyer)(online_users_entity_1.default, { socket_id: socket.id });
+                console.log("dResult", destroyResult);
             }))();
         });
     });

@@ -17,7 +17,7 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
       }else{
         const decodedUser = decoderToken(token);
         if(decodedUser){
-          const user = await findOne(OnlineUsers,{socket_id: socket.id});          
+          const user = await findOne(OnlineUsers,{user_id: decodedUser.id});          
           if(!user){
             await insert(OnlineUsers,{socket_id: socket.id, user_id: decodedUser.id})
           }else{
@@ -34,7 +34,9 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
       console.log("disconnect bo'ldi", socket.id);
          
       (async() =>{
-       await destroyer(OnlineUsers, {socket_id: socket.id})
+      const destroyResult = await destroyer(OnlineUsers, {socket_id: socket.id});
+      console.log("dResult", destroyResult);
+      
       })()
     })
   })
