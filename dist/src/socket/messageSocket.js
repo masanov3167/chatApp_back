@@ -41,6 +41,13 @@ exports.default = (io, socket) => {
                 }
             }
         }));
+        socket.on("new-voice-message", (msg) => __awaiter(void 0, void 0, void 0, function* () {
+            const message = JSON.parse(msg);
+            const user = yield (0, OrmFn_1.findOne)(online_users_entity_1.default, { user_id: message.user_id });
+            if (user) {
+                io.to(user.socket_id).emit("answer-new-voice-message", message);
+            }
+        }));
     }
     catch (error) {
         console.log(error);

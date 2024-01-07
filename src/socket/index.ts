@@ -7,6 +7,7 @@ import { decoderToken } from "../utils/functions";
 
 export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
   io.on('connection', (socket) => {
+    console.log("connect bo'ldi ", socket.id);
     (async() =>{
       let token = socket.handshake.auth?.token["_j"];      
       if(!token){
@@ -26,7 +27,8 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
     
     messageSocket(io, socket)
 
-    socket.on("disconnect", () =>{            
+    socket.on("disconnect", () =>{      
+      console.log("disconnect bo'ldi ",socket.id);
       (async() =>{
       await destroyer(OnlineUsers, {socket_id: socket.id});      
       })()

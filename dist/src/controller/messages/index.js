@@ -15,7 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const getCustomParams_1 = __importDefault(require("../../utils/getCustomParams"));
 const SuccessResponse_1 = __importDefault(require("../../utils/SuccessResponse"));
 const OrmFn_1 = require("../../utils/OrmFn");
+const message_entity_1 = __importDefault(require("../../entities/message.entity"));
 const errorHandler_1 = require("../../utils/errorHandler");
+const multerconfig_1 = __importDefault(require("../../config/multerconfig"));
+const voice_messages_entity_1 = __importDefault(require("../../entities/voice.messages.entity"));
+const functions_1 = require("../../utils/functions");
 const get = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { user: currentUser } = req;
     const { chat_id } = req.query;
@@ -42,8 +46,62 @@ const get = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield (0, OrmFn_1.customQuery)(query);
     (0, SuccessResponse_1.default)(res, result, next);
 });
+const uploadVoice = (req, res, next) => {
+    const regex = /\.(mp3|wav|aac|ogg|flac|aiff|m4a|wma)$/;
+    const voiceStorage = (0, multerconfig_1.default)("voices", regex);
+    if (voiceStorage) {
+        const upload = voiceStorage.single("voice");
+        upload(req, res, function (err) {
+            if (err || !req.file) {
+                return next(new errorHandler_1.ErrorHandler(err ? String(err) : "voice not found", 404));
+            }
+            next();
+        });
+    }
+    else {
+        return next(new errorHandler_1.ErrorHandler("fayl yuklashda muammo"));
+    }
+};
+const postVoice = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { user: currentUser } = req;
+    const { chat_id } = req.query;
+    const newMessage = yield (0, OrmFn_1.insert)(message_entity_1.default, { sender_user_id: currentUser.id, user_id: chat_id });
+    if (newMessage.ok && newMessage.data) {
+        const voiceMessage = yield (0, OrmFn_1.insert)(voice_messages_entity_1.default, { message_id: newMessage.data.id, path: `public/voices/${req.file.filename}`, duration: 30, size: req.file.size });
+        if (voiceMessage.ok) {
+            const responseData = {
+                id: newMessage.data.id,
+                sender_user_id: currentUser.id,
+                user_id: chat_id,
+                date: newMessage.data.date,
+                voice: {
+                    path: voiceMessage.data.path,
+                    size: voiceMessage.data.size,
+                    duration: voiceMessage.data.duration
+                }
+            };
+            (0, SuccessResponse_1.default)(res, responseData, next);
+            return;
+        }
+        else {
+            yield (0, OrmFn_1.destroyer)(message_entity_1.default, { id: newMessage.data.id });
+            (0, functions_1.removeMedia)(`voices/${req.file.filename}`);
+            return next(new errorHandler_1.ErrorHandler("Fayl yuklashda hatolik :("));
+        }
+    }
+    else {
+        (0, functions_1.removeMedia)(`voices/${req.file.filename}`);
+        return next(new errorHandler_1.ErrorHandler("Fayl yuklashda hatolik :("));
+    }
+});
 exports.default = {
     get: (_, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         (0, getCustomParams_1.default)(_, res, next, get);
+    }),
+    postVoice: (_, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        (0, getCustomParams_1.default)(_, res, next, postVoice);
+    }),
+    uploadVoice: (_, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        (0, getCustomParams_1.default)(_, res, next, uploadVoice);
     }),
 };

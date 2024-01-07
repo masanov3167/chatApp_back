@@ -29,6 +29,13 @@ export default (io : Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap
           }
         }
       })
+      socket.on("new-voice-message", async (msg) => {  
+        const message = JSON.parse(msg);
+        const user = await findOne(OnlineUsers, {user_id: message.user_id});
+        if(user){
+          io.to(user.socket_id).emit("answer-new-voice-message", message)
+        }
+      })
   } catch (error) {
     console.log(error);
   }
