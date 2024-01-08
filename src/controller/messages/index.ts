@@ -39,7 +39,7 @@ const get = async (req: CustomRequest, res: Response, next: NextFunction) => {
   succesResponse(res, result, next);
 };
 
-const uploadVoice = (req: Request, res: Response, next: NextFunction) => {
+const uploadVoice = (req: Request, res: Response, next: NextFunction) => {  
   const regex = /\.(mp3|wav|aac|ogg|flac|aiff|m4a|wma)$/
   const voiceStorage = storage("voices", regex);
   if(voiceStorage){

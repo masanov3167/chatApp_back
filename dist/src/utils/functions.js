@@ -32,7 +32,7 @@ function signToken(user) {
 exports.signToken = signToken;
 const removeMedia = (file) => {
     try {
-        const url = path_1.default.join(__dirname, "..", "public", file);
+        const url = path_1.default.join("public", file);
         (0, fs_1.existsSync)(url) ? (0, fs_1.unlinkSync)(url) : false;
         return true;
     }

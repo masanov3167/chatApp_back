@@ -31,7 +31,7 @@ export function signToken(user: Users): string | false{
 
 export const removeMedia = (file: string): boolean =>{
   try{
-    const url = path.join(__dirname,"..", "public", file);
+    const url = path.join("public", file);
     existsSync(url) ? unlinkSync(url) : false;
     return true
   }catch(e){

@@ -7,7 +7,7 @@ const storage = (folderPath: string, filterRegex: RegExp): Multer | null => {
    try{
     const multerStorage = multer.diskStorage({
         destination: (_, __, cb) => {
-          cb(null, path.join(__dirname, '..', '..', 'public', folderPath + '/'))
+          cb(null, path.join('public', folderPath + '/'))
         },
         filename: (d, file, cb) => {
           cb(null, `${file.fieldname}-${uuid.v4()}${path.extname(file.originalname)}`)
