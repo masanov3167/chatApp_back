@@ -18,6 +18,7 @@ const storage = (folderPath, filterRegex) => {
             },
         });
         const fileFilter = (_, file, cb) => {
+            console.log("filter ichida fayl : ", file);
             if (!file.originalname.match(new RegExp(filterRegex))) {
                 return cb(new errorHandler_1.ErrorHandler('Faylning tipi noto\'g\'ri'));
             }
