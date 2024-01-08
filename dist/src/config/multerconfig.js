@@ -11,7 +11,7 @@ const storage = (folderPath, filterRegex) => {
     try {
         const multerStorage = multer_1.default.diskStorage({
             destination: (_, __, cb) => {
-                cb(null, path_1.default.join(__dirname, '..', '..', "..", 'public', folderPath + '/'));
+                cb(null, path_1.default.join('public', folderPath + '/'));
             },
             filename: (d, file, cb) => {
                 cb(null, `${file.fieldname}-${uuid.v4()}${path_1.default.extname(file.originalname)}`);
