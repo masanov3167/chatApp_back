@@ -19,8 +19,10 @@ const ormcongif_1 = require("../config/ormcongif");
  * @returns qiymatlar bo'yicha topilgan datalarni yuboradi agar muammo chiqib catchga tushsa bo'sh array qabul qilasiz
  */
 const findAll = (model, where, relations, order, select) => __awaiter(void 0, void 0, void 0, function* () {
-    const conn = yield ormcongif_1.dataSource.connect();
+    const conn = yield ormcongif_1.dataSource.connect().catch(() => null);
     try {
+        if (!conn)
+            return [];
         const value = yield conn.getRepository(model).find({
             where,
             relations,
@@ -34,7 +36,7 @@ const findAll = (model, where, relations, order, select) => __awaiter(void 0, vo
         return [];
     }
     finally {
-        yield conn.close();
+        yield conn.close().catch(e => console.log("Error conn closed : ", e));
     }
 });
 exports.findAll = findAll;
@@ -45,8 +47,10 @@ exports.findAll = findAll;
  * @returns qiymatlar bo'yicha topilgan datani yuboradi agar muammo chiqib catchga tushsa null qaytariladi
  */
 const findOne = (model, where, relations) => __awaiter(void 0, void 0, void 0, function* () {
-    const conn = yield ormcongif_1.dataSource.connect();
+    const conn = yield ormcongif_1.dataSource.connect().catch(() => null);
     try {
+        if (!conn)
+            return null;
         const value = yield conn
             .getRepository(model)
             .findOne({ where, relations });
@@ -57,7 +61,7 @@ const findOne = (model, where, relations) => __awaiter(void 0, void 0, void 0, f
         return null;
     }
     finally {
-        yield conn.close();
+        yield conn.close().catch(e => console.log("Error conn closed : ", e));
     }
 });
 exports.findOne = findOne;
@@ -67,8 +71,10 @@ exports.findOne = findOne;
  * @returns qiymatlar bo'yicha topilgan datalarni sonini (length) yuboradi agar muammo chiqib catchga tushsa 0 qabul qilasiz
  */
 const findCount = (model, where) => __awaiter(void 0, void 0, void 0, function* () {
-    const conn = yield ormcongif_1.dataSource.connect();
+    const conn = yield ormcongif_1.dataSource.connect().catch(() => null);
     try {
+        if (!conn)
+            return 0;
         const [_, totalCount] = yield conn
             .getRepository(model)
             .findAndCount({ where });
@@ -78,15 +84,19 @@ const findCount = (model, where) => __awaiter(void 0, void 0, void 0, function* 
         return 0;
     }
     finally {
-        yield conn.close();
+        yield conn.close().catch(e => console.log("Error conn closed : ", e));
     }
 });
 exports.findCount = findCount;
 const destroyer = (model, where) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const result = { ok: false, data: {}, msg: "" };
-    const conn = yield ormcongif_1.dataSource.connect();
+    const conn = yield ormcongif_1.dataSource.connect().catch(() => null);
     try {
+        if (!conn) {
+            result.msg = "Connection error";
+            return result;
+        }
         const deleted = yield conn
             .createQueryBuilder()
             .delete()
@@ -115,7 +125,7 @@ const destroyer = (model, where) => __awaiter(void 0, void 0, void 0, function* 
         return result;
     }
     finally {
-        yield conn.close();
+        yield conn.close().catch(e => console.log("Error conn closed : ", e));
     }
 });
 exports.destroyer = destroyer;
@@ -130,8 +140,12 @@ const update = (model, where, set) => __awaiter(void 0, void 0, void 0, function
         data: {},
         msg: "",
     };
-    const conn = yield ormcongif_1.dataSource.connect();
+    const conn = yield ormcongif_1.dataSource.connect().catch(() => null);
     try {
+        if (!conn) {
+            result.msg = "connection error";
+            return result;
+        }
         const updated = yield conn
             .createQueryBuilder()
             .update(model)
@@ -156,7 +170,7 @@ const update = (model, where, set) => __awaiter(void 0, void 0, void 0, function
         return result;
     }
     finally {
-        yield conn.close();
+        yield conn.close().catch(e => console.log("Error conn closed : ", e));
     }
 });
 exports.update = update;
@@ -167,8 +181,12 @@ exports.update = update;
  */
 const insert = (model, value) => __awaiter(void 0, void 0, void 0, function* () {
     const result = { ok: false, data: {}, msg: "" };
-    const conn = yield ormcongif_1.dataSource.connect();
+    const conn = yield ormcongif_1.dataSource.connect().catch(() => null);
     try {
+        if (!conn) {
+            result.msg = "connection error";
+            return result;
+        }
         const created = yield conn
             .getRepository(model)
             .createQueryBuilder()
@@ -194,13 +212,15 @@ const insert = (model, value) => __awaiter(void 0, void 0, void 0, function* () 
         return result;
     }
     finally {
-        yield conn.close();
+        yield conn.close().catch(e => console.log("Error conn closed : ", e));
     }
 });
 exports.insert = insert;
 const customQuery = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    const conn = yield ormcongif_1.dataSource.connect();
+    const conn = yield ormcongif_1.dataSource.connect().catch(() => null);
     try {
+        if (!conn)
+            return [];
         const result = yield conn.query(query);
         return result;
     }
@@ -209,7 +229,7 @@ const customQuery = (query) => __awaiter(void 0, void 0, void 0, function* () {
         return [];
     }
     finally {
-        yield conn.close();
+        yield conn.close().catch(e => console.log("Error conn closed : ", e));
     }
 });
 exports.customQuery = customQuery;

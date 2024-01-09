@@ -28,22 +28,54 @@ const get = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         return next(new errorHandler_1.ErrorHandler("chat_id yaroqli emas", 404));
     }
     const query = `SELECT 
-  m.id, m.sender_user_id,m.user_id, m.date, t.text AS "text" 
-  FROM 
+  m.id, 
+  m.sender_user_id, 
+  m.user_id, 
+  m.date, 
+  CASE WHEN t.text IS NOT NULL THEN t.text END AS "text", 
+  CASE 
+    WHEN v IS NOT NULL
+    THEN JSON_BUILD_OBJECT('size', v.size, 'duration',v.duration, 'path', v.path) 
+  END AS "voice"
+FROM 
   chat_messages m 
-  INNER JOIN 
+LEFT JOIN 
   chat_text_messages t 
-  ON 
+ON 
   m.id = t.message_id 
-  WHERE
-  m.sender_user_id = ${currentUser.id}
-  AND
-  m.user_id = ${chat_id}
+LEFT JOIN
+  chat_voice_messages v
+ON
+  m.id = v.message_id
+WHERE
+  (m.sender_user_id = ${currentUser.id} AND m.user_id = ${chat_id})
   OR
-  m.sender_user_id = ${chat_id}
-  AND
-  m.user_id = ${currentUser.id}`;
-    const result = yield (0, OrmFn_1.customQuery)(query);
+  (m.sender_user_id = ${chat_id} AND m.user_id = ${currentUser.id})`;
+    const query1 = `SELECT 
+  m.id, 
+  m.sender_user_id, 
+  m.user_id, 
+  m.date, 
+  t.text AS "text", 
+  CASE 
+    WHEN v.path IS NOT NULL
+    THEN JSON_BUILD_OBJECT('size', v.size, 'duration',v.duration, 'path', v.path) 
+  END AS "voice"
+FROM 
+  chat_messages m 
+LEFT JOIN 
+  chat_text_messages t 
+ON 
+  m.id = t.message_id 
+LEFT JOIN
+  chat_voice_messages v
+ON
+  m.id = v.message_id
+WHERE
+  (m.sender_user_id = ${currentUser.id} AND m.user_id = ${chat_id})
+  OR
+  (m.sender_user_id = ${chat_id} AND m.user_id = ${currentUser.id})`;
+    const result = yield (0, OrmFn_1.customQuery)(query1);
     (0, SuccessResponse_1.default)(res, result, next);
 });
 const uploadVoice = (req, res, next) => {
