@@ -32,30 +32,6 @@ const get = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
   m.sender_user_id, 
   m.user_id, 
   m.date, 
-  CASE WHEN t.text IS NOT NULL THEN t.text END AS "text", 
-  CASE 
-    WHEN v IS NOT NULL
-    THEN JSON_BUILD_OBJECT('size', v.size, 'duration',v.duration, 'path', v.path) 
-  END AS "voice"
-FROM 
-  chat_messages m 
-LEFT JOIN 
-  chat_text_messages t 
-ON 
-  m.id = t.message_id 
-LEFT JOIN
-  chat_voice_messages v
-ON
-  m.id = v.message_id
-WHERE
-  (m.sender_user_id = ${currentUser.id} AND m.user_id = ${chat_id})
-  OR
-  (m.sender_user_id = ${chat_id} AND m.user_id = ${currentUser.id})`;
-    const query1 = `SELECT 
-  m.id, 
-  m.sender_user_id, 
-  m.user_id, 
-  m.date, 
   t.text AS "text", 
   CASE 
     WHEN v.path IS NOT NULL
@@ -74,8 +50,8 @@ ON
 WHERE
   (m.sender_user_id = ${currentUser.id} AND m.user_id = ${chat_id})
   OR
-  (m.sender_user_id = ${chat_id} AND m.user_id = ${currentUser.id})`;
-    const result = yield (0, OrmFn_1.customQuery)(query1);
+  (m.sender_user_id = ${chat_id} AND m.user_id = ${currentUser.id}) ORDER BY m.id`;
+    const result = yield (0, OrmFn_1.customQuery)(query);
     (0, SuccessResponse_1.default)(res, result, next);
 });
 const uploadVoice = (req, res, next) => {
