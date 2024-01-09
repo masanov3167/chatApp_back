@@ -1,5 +1,7 @@
-import { EntityTarget, FindOptionsSelect, FindOptionsSelectByString, FindOptionsWhere } from "typeorm";
+import { DataSource, EntityTarget, FindOptionsSelect, FindOptionsSelectByString, FindOptionsWhere } from "typeorm";
 import { dataSource } from "../config/ormcongif";
+
+type DType = DataSource | null
 
 /**
  *
@@ -15,8 +17,9 @@ const findAll = async <T>(
   order?: any,
   select?: FindOptionsSelect<T> | FindOptionsSelectByString<T>,
 ): Promise<T[]> => {
-  const conn = await dataSource.connect()
+  const conn: DType = await dataSource.connect().catch(() => null);
   try {
+    if(!conn) return []
     const value = await conn.getRepository(model).find({
       where,
       relations,
@@ -29,7 +32,7 @@ const findAll = async <T>(
     
     return [];
   } finally {
-    await conn.close()
+    await conn.close().catch(e => console.log("Error conn closed : ", e))
   }
 };
 
@@ -44,8 +47,9 @@ const findOne = async <T>(
   where: FindOptionsWhere<T>,
   relations?: string[]
 ): Promise<T> => {
-  const conn = await dataSource.connect();
+  const conn:DType  = await dataSource.connect().catch(() => null);
   try {
+    if(!conn) return null
     const value = await conn
       .getRepository(model)
       .findOne({ where, relations });
@@ -55,7 +59,7 @@ const findOne = async <T>(
     
     return null;
   } finally {
-    await conn.close()
+    await conn.close().catch(e => console.log("Error conn closed : ", e))
   }
 };
 
@@ -68,8 +72,9 @@ const findCount = async <T>(
   model: EntityTarget<T>,
   where: FindOptionsWhere<T>
 ): Promise<number> => {
-  const conn = await dataSource.connect()
+  const conn: DType = await dataSource.connect().catch(() => null)
   try {
+    if(!conn) return 0
     const [_, totalCount] = await conn
       .getRepository(model)
       .findAndCount({ where });
@@ -77,7 +82,7 @@ const findCount = async <T>(
   } catch (e) {
     return 0;
   } finally {
-    await conn.close()
+    await conn.close().catch(e => console.log("Error conn closed : ", e))
   }
 };
 
@@ -92,8 +97,12 @@ const destroyer = async <T>(
   where: FindOptionsWhere<T>
 ) => {
   const result: ormFunctionsReturnResultType = { ok: false, data: {}, msg: "" };
-  const conn = await dataSource.connect()
+  const conn: DType = await dataSource.connect().catch(() => null)
   try {
+    if(!conn){
+      result.msg = "Connection error";
+      return result
+    }
     const deleted = await conn
       .createQueryBuilder()
       .delete()
@@ -126,7 +135,7 @@ const destroyer = async <T>(
     }
     return result;
   } finally {
-    await conn.close()
+    await conn.close().catch(e => console.log("Error conn closed : ", e))
   }
 };
 
@@ -145,8 +154,12 @@ const update = async <T>(
     data: {},
     msg: "",
   };
-  const conn = await dataSource.connect()
+  const conn: DType = await dataSource.connect().catch(() => null)
   try {
+    if(!conn){
+      result.msg = "connection error";
+      return result
+    }
     const updated = await conn
       .createQueryBuilder()
       .update(model)
@@ -170,7 +183,7 @@ const update = async <T>(
     result.msg = String(e).substring(400);
     return result;
   } finally {
-    await conn.close()
+    await conn.close().catch(e => console.log("Error conn closed : ", e))
   }
 };
 
@@ -181,8 +194,12 @@ const update = async <T>(
  */
 const insert = async <T>(model: EntityTarget<T>, value: any) => {
   const result: ormFunctionsReturnResultType = { ok: false, data: {}, msg: "" };
-  const conn = await dataSource.connect()
+  const conn: DType = await dataSource.connect().catch(() => null)
   try {
+    if(!conn) {
+      result.msg = "connection error";
+      return result
+    }
     const created = await conn
       .getRepository(model)
       .createQueryBuilder()
@@ -210,20 +227,21 @@ const insert = async <T>(model: EntityTarget<T>, value: any) => {
     result.data = null;
     return result;
   } finally {
-    await conn.close();
+    await conn.close().catch(e => console.log("Error conn closed : ", e))
   }
 };
 
 const customQuery = async (query: string) => {
-  const conn = await dataSource.connect() 
+  const conn: DType = await dataSource.connect().catch(() => null) 
   try{
+    if(!conn) return []
     const result = await conn.query(query);
     return result
   }catch(e){
     console.log(JSON.stringify(e));
     return []
   }finally{
-    await conn.close();
+    await conn.close().catch(e => console.log("Error conn closed : ", e))
   }
 }
 

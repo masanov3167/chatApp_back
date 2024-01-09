@@ -19,23 +19,58 @@ const get = async (req: CustomRequest, res: Response, next: NextFunction) => {
     return next(new ErrorHandler("chat_id yaroqli emas", 404))
   }  
   const query = `SELECT 
-  m.id, m.sender_user_id,m.user_id, m.date, t.text AS "text" 
-  FROM 
+  m.id, 
+  m.sender_user_id, 
+  m.user_id, 
+  m.date, 
+  CASE WHEN t.text IS NOT NULL THEN t.text END AS "text", 
+  CASE 
+    WHEN v IS NOT NULL
+    THEN JSON_BUILD_OBJECT('size', v.size, 'duration',v.duration, 'path', v.path) 
+  END AS "voice"
+FROM 
   chat_messages m 
-  INNER JOIN 
+LEFT JOIN 
   chat_text_messages t 
-  ON 
+ON 
   m.id = t.message_id 
-  WHERE
-  m.sender_user_id = ${currentUser.id}
-  AND
-  m.user_id = ${chat_id}
+LEFT JOIN
+  chat_voice_messages v
+ON
+  m.id = v.message_id
+WHERE
+  (m.sender_user_id = ${currentUser.id} AND m.user_id = ${chat_id})
   OR
-  m.sender_user_id = ${chat_id}
-  AND
-  m.user_id = ${currentUser.id}`
+  (m.sender_user_id = ${chat_id} AND m.user_id = ${currentUser.id})`
 
-  const result = await customQuery(query);
+  const query1 = `SELECT 
+  m.id, 
+  m.sender_user_id, 
+  m.user_id, 
+  m.date, 
+  t.text AS "text", 
+  CASE 
+    WHEN v.path IS NOT NULL
+    THEN JSON_BUILD_OBJECT('size', v.size, 'duration',v.duration, 'path', v.path) 
+  END AS "voice"
+FROM 
+  chat_messages m 
+LEFT JOIN 
+  chat_text_messages t 
+ON 
+  m.id = t.message_id 
+LEFT JOIN
+  chat_voice_messages v
+ON
+  m.id = v.message_id
+WHERE
+  (m.sender_user_id = ${currentUser.id} AND m.user_id = ${chat_id})
+  OR
+  (m.sender_user_id = ${chat_id} AND m.user_id = ${currentUser.id})`
+
+
+
+  const result = await customQuery(query1);
   succesResponse(res, result, next);
 };
 
